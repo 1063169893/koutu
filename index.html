@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自动抠图</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    .conn {
+      padding: 20px;
+    }
+
+    .inputeru {
+      display: flex;
+    }
+
+    .ungd {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .ungd img {
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="conn">
+
+    <input type="file" name="" id="image" onchange="selectFill()">
+    <button onclick="upimgefun()">抠图</button>
+    <!-- <button> <a type=>保存</a> </button> -->
+    <div class="inputeru">
+      <div class="ungd">
+        <div class="ytu">原图</div>
+        <img id="upimg" alt="先选一张图片">
+      </div>
+      <div class="ungd">
+        <div class="ytu">完成的图片</div>
+        <img id="ingimghs" alt="完成的图片">
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+<script>
+  function selectFill(upimgefun) {
+    const filbox = document.getElementById('image')
+
+    if (filbox.value) {
+      const img = document.getElementById('upimg')
+      let reader = new FileReader();
+      var file = image.files[0];
+      let imgUrlBase64;
+
+      imgUrlBase64 = reader.readAsDataURL(file);
+
+      let AllowImgFileSize = 2100000;
+      reader.onload = function (e) {
+        //var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
+        if (AllowImgFileSize != 0 && AllowImgFileSize < reader.result.length) {
+          alert('上传失败，请上传不大于2M的图片！');
+          return;
+        } else {
+          //执行上传操作
+          console.log('imgimg', reader.result)
+          img.src = reader.result
+
+        }
+      }
+    }
+  }
+
+  function upimgefun() {
+    const inputer = document.getElementById('image')
+    const img = document.getElementById('upimg')
+    const imageList = image.files[0]
+    if (image.value && imageList) {
+      const imgScrdata = document.getElementById('upimg').src
+      const strarr = imgScrdata.split(',')
+      console.log('strarr', strarr)
+      const upBase64 = strarr[1]
+      console.log('upBase64', upBase64)
+      axiosFun(upBase64)
+    } else {
+      alert('先选择图片')
+    }
+  }
+
+  function axiosFun(upBase64) {
+    const instance = axios.create({
+      baseURL: 'http://192.168.0.103:5870',
+      timeout: 10000
+    });
+    instance({
+        method: 'POST',
+        url: '/test_1.0',
+        data: {
+          type: 'all',
+          src: upBase64
+        }
+      })
+      .then(function (response) {
+        console.log('response', response)
+        if (response.data.status === 200) {
+          document.getElementById('ingimghs').src = response.data.msg
+        }
+      });
+  }
+</script>
